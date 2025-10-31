@@ -1,0 +1,78 @@
+// Prisma schema for Kiro-WhatsApp Integration
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users table - stores WhatsApp user information
+model User {
+  id           String    @id @default(uuid())
+  phoneNumber  String    @unique @map("phone_number") @db.VarChar(20)
+  workspaceId  String    @map("workspace_id") @db.VarChar(255)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  lastActive   DateTime  @default(now()) @map("last_active")
+  
+  // Relations
+  sessions     Session[]
+  settings     Settings?
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+// Sessions table - manages authentication sessions
+model Session {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// Settings table - user preferences and configuration
+model Settings {
+  id                    String   @id @default(uuid())
+  userId                String   @unique @map("user_id")
+  notificationEnabled   Boolean  @default(true) @map("notification_enabled")
+  notificationTypes     Json     @default("[]") @map("notification_types")
+  accessibleDirectories Json     @default("[]") @map("accessible_directories")
+  readOnlyMode          Boolean  @default(true) @map("read_only_mode")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("settings")
+}
+
+// Audit logs table - tracks all command executions
+model AuditLog {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  commandType    String   @map("command_type") @db.VarChar(50)
+  commandPayload Json?    @map("command_payload")
+  status         String   @db.VarChar(20)
+  errorMessage   String?  @map("error_message") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([createdAt])
+  @@index([commandType])
+}

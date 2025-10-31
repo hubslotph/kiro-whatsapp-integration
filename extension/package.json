@@ -1,0 +1,108 @@
+{
+  "name": "kiro-whatsapp-extension",
+  "displayName": "Kiro WhatsApp Integration",
+  "description": "Enables WhatsApp-based workspace access and management for Kiro IDE",
+  "version": "1.0.0",
+  "publisher": "kiro",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "kiro-whatsapp.openSettings",
+        "title": "Kiro WhatsApp: Open Settings"
+      },
+      {
+        "command": "kiro-whatsapp.openSettingsPanel",
+        "title": "Kiro WhatsApp: Open Settings Panel"
+      },
+      {
+        "command": "kiro-whatsapp.startServer",
+        "title": "Kiro WhatsApp: Start WebSocket Server"
+      },
+      {
+        "command": "kiro-whatsapp.stopServer",
+        "title": "Kiro WhatsApp: Stop WebSocket Server"
+      },
+      {
+        "command": "kiro-whatsapp.showStatus",
+        "title": "Kiro WhatsApp: Show Connection Status"
+      }
+    ],
+    "configuration": {
+      "title": "Kiro WhatsApp Integration",
+      "properties": {
+        "kiroWhatsapp.websocketPort": {
+          "type": "number",
+          "default": 3001,
+          "description": "Port for WebSocket server"
+        },
+        "kiroWhatsapp.autoStart": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically start WebSocket server on extension activation"
+        },
+        "kiroWhatsapp.accessibleDirectories": {
+          "type": "array",
+          "default": [],
+          "description": "List of directories accessible via WhatsApp (empty = all workspace)"
+        },
+        "kiroWhatsapp.readOnlyMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Restrict operations to read-only commands"
+        },
+        "kiroWhatsapp.enableNotifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable workspace event notifications"
+        },
+        "kiroWhatsapp.notificationTypes": {
+          "type": "array",
+          "default": ["BUILD_COMPLETE", "ERROR", "GIT_OPERATION"],
+          "description": "Types of notifications to send"
+        },
+        "kiroWhatsapp.backendUrl": {
+          "type": "string",
+          "default": "http://localhost:3000",
+          "description": "Backend service URL"
+        },
+        "kiroWhatsapp.authToken": {
+          "type": "string",
+          "default": "",
+          "description": "Authentication token for backend service"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\""
+  },
+  "dependencies": {
+    "socket.io": "^4.6.1",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.11.5",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "typescript": "^5.3.3"
+  }
+}
