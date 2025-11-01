@@ -72,12 +72,12 @@ router.post('/send-message', async (req: Request, res: Response) => {
     }
 
     const result = await evolutionAPIService.sendTextMessage({ number, text });
-    res.json({
+    return res.json({
       success: true,
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: error.message,
     });
