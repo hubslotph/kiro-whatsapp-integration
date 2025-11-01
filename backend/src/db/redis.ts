@@ -9,10 +9,13 @@ let redisClient: RedisClientType | null = null;
  */
 export async function getRedisClient(): Promise<RedisClientType> {
   if (!redisClient) {
+    const useTLS = process.env.REDIS_TLS === 'true';
+
     redisClient = createClient({
       socket: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
+        tls: useTLS,
       },
       password: process.env.REDIS_PASSWORD || undefined,
     });

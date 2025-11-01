@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp QR Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        #qrcode {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+        button {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #128C7E;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Kiro WhatsApp Integration</h1>
+        <p>Scan this QR code with WhatsApp to connect</p>
+        
+        <div id="qrcode">
+            <p class="loading">Loading QR code...</p>
+        </div>
+        
+        <button onclick="loadQRCode()">🔄 Refresh QR Code</button>
+        <button onclick="checkStatus()">✅ Check Status</button>
+        
+        <div id="status"></div>
+        
+        <div style="margin-top: 30px; color: #666; font-size: 14px;">
+            <p><strong>How to scan:</strong></p>
+            <ol style="text-align: left; display: inline-block;">
+                <li>Open WhatsApp on your phone</li>
+                <li>Go to Settings → Linked Devices</li>
+                <li>Tap "Link a Device"</li>
+                <li>Scan this QR code</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function loadQRCode() {
+            const qrcodeDiv = document.getElementById('qrcode');
+            const statusDiv = document.getElementById('status');
+            
+            qrcodeDiv.innerHTML = '<p class="loading">Loading QR code...</p>';
+            statusDiv.innerHTML = '';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/evolution/qrcode');
+                const data = await response.json();
+                
+                if (data.success && data.data.base64) {
+                    qrcodeDiv.innerHTML = `<img src="${data.data.base64}" alt="QR Code" style="max-width: 300px; border: 2px solid #ddd; border-radius: 10px;">`;
+                    statusDiv.innerHTML = '<div class="status success">✅ QR Code loaded! Scan with WhatsApp</div>';
+                } else {
+                    qrcodeDiv.innerHTML = '<p class="error">Failed to load QR code</p>';
+                    statusDiv.innerHTML = '<div class="status error">❌ Error: ' + (data.error || 'Unknown error') + '</div>';
+                }
+            } catch (error) {
+                qrcodeDiv.innerHTML = '<p class="error">Failed to connect to server</p>';
+                statusDiv.innerHTML = '<div class="status error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+        
+        async function checkStatus() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<div class="status loading">⏳ Checking status...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/evolution/status');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const status = data.data.instance.status;
+                    if (status === 'open') {
+                        statusDiv.innerHTML = '<div class="status success">✅ Connected! WhatsApp is ready</div>';
+                    } else {
+                        statusDiv.innerHTML = '<div class="status loading">⏳ Status: ' + status + '</div>';
+                    }
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ Not connected yet. Please scan QR code.</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Error: ' + error.message + '</div>';
+            }
+        }
+        
+        // Auto-load QR code on page load
+        window.onload = loadQRCode;
+        
+        // Auto-refresh QR code every 30 seconds
+        setInterval(loadQRCode, 30000);
+    </script>
+</body>
+</html>

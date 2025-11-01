@@ -7,6 +7,7 @@ import whatsappRoutes from './routes/whatsapp.routes';
 import notificationRoutes from './routes/notification.routes';
 import settingsRoutes from './routes/settings.routes';
 import auditRoutes from './routes/audit.routes';
+import evolutionRoutes from './routes/evolution.routes';
 import { notificationDispatcher } from './services/notification-dispatcher.service';
 import { SettingsService } from './services/settings.service';
 import { SettingsBroadcasterService } from './services/settings-broadcaster.service';
@@ -28,6 +29,7 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/audit', auditRoutes);
+app.use('/api/evolution', evolutionRoutes);
 
 // Health check endpoint
 app.get('/health', async (_req: Request, res: Response) => {
